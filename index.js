@@ -3,6 +3,10 @@ const express = require('express');
 const http = require('http')
 const socketio = require('socket.io');
 const mongoose = require('mongoose')
+const authRoute = require('./routes/auth')
+let bodyParser = require("body-parser");
+let cookieParser = require("cookie-parser");
+let cors = require("cors");
 
 require('ejs');
 require("dotenv").config();
@@ -26,6 +30,51 @@ const connectToDB = async() => {
 connectToDB().then(() => {
   console.log('connected to DB')
 });
+
+app.use(cookieParser());
+app.use(cors());
+app.use(bodyParser.json()); // Middleware for reading request body
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+
+
+app.use("/", (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  const schema = req.headers["x-forwarded-proto"];
+
+  if (schema === "https" || schema === "http") {
+    req.socket.encrypted = true;
+  }
+  next();
+});
+
+app.all("*", (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  let schema = req.headers["x-forwarded-proto"];
+
+  if (schema === "https" || schema === "http") {
+    req.socket.encrypted = true;
+  }
+  next();
+});
+
+app.all("/", (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  let schema = req.headers["x-forwarded-proto"];
+
+  if (schema === "https" || schema === "http") {
+    req.socket.encrypted = true;
+  }
+  next();
+});
   
 // app.use(express.static(path.join(__dirname, 'public')));
 app.use("/public", express.static(path.join(__dirname, "/public")));
@@ -33,8 +82,10 @@ app.set("view engine", "ejs");
 
 const botName = 'Admin'
 
+app.use('/api', authRoute);
+
 app.get("/", function (req, res) {
-  res.render("pages/index");
+  res.render("pages/login");
 });
 
 app.get("/chat", function (req, res) {

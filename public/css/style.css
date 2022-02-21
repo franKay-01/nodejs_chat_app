@@ -126,6 +126,13 @@ a {
 	flex: 1;
 }
 
+.chat-form-container input[type='password'] {
+	font-size: 16px;
+	padding: 5px;
+	height: 40px;
+	flex: 1;
+}
+
 /* Join Page */
 .join-container {
 	max-width: 500px;
@@ -160,6 +167,13 @@ a {
 }
 
 .join-main input[type='text'] {
+	font-size: 16px;
+	padding: 5px;
+	height: 40px;
+	width: 100%;
+}
+
+.join-main input[type='password'] {
 	font-size: 16px;
 	padding: 5px;
 	height: 40px;
